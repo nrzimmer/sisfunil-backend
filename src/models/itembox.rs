@@ -1,14 +1,12 @@
 use serde::{Deserialize, Serialize};
 use diesel::prelude::*;
 
-use crate::models::location::Location;
-
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq, Deserialize, Serialize)]
+#[diesel(belongs_to(crate::models::location::Location))]
 #[diesel(table_name = crate::database::schema::boxes)]
 #[diesel(check_for_backend(diesel::mysql::Mysql))]
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ItemBox {
+pub struct Box {
     pub id: u32,
     pub description: String,
-    pub location: Location,
+    pub location_id: u32
 }

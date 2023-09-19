@@ -1,30 +1,30 @@
 CREATE TABLE `groups` (
-                          `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                          `name` varchar(255) DEFAULT NULL,
+                          `id` INT unsigned NOT NULL AUTO_INCREMENT,
+                          `name` varchar(255) NOT NULL DEFAULT '',
                           PRIMARY KEY (`id`),
                           UNIQUE KEY `groups_name_UN` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `locations` (
-                             `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                             `name` varchar(255) DEFAULT NULL,
-                             `description` text DEFAULT NULL,
+                             `id` INT unsigned NOT NULL AUTO_INCREMENT,
+                             `name` varchar(255) NOT NULL DEFAULT '',
+                             `description` text NOT NULL DEFAULT '',
                              PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `boxes` (
-                         `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                         `location_id` int(11) unsigned DEFAULT NULL,
-                         `description` text DEFAULT NULL,
+                         `id` INT unsigned NOT NULL AUTO_INCREMENT,
+                         `location_id` INT unsigned NOT NULL DEFAULT 0,
+                         `description` text NOT NULL DEFAULT '',
                          PRIMARY KEY (`id`),
                          KEY `boxes_locations_FK` (`location_id`),
                          CONSTRAINT `boxes_locations_FK` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `types` (
-                         `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                         `group_id` int(11) unsigned DEFAULT NULL,
-                         `name` varchar(255) DEFAULT NULL,
+                         `id` INT unsigned NOT NULL AUTO_INCREMENT,
+                         `group_id` INT unsigned NOT NULL DEFAULT 0,
+                         `name` varchar(255) NOT NULL DEFAULT '',
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `types_name_UN` (`name`),
                          KEY `types_groups_FK` (`group_id`),
@@ -32,23 +32,23 @@ CREATE TABLE `types` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `categories` (
-                              `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                              `type_id` int(11) unsigned DEFAULT NULL,
-                              `name` varchar(255) DEFAULT NULL,
+                              `id` INT unsigned NOT NULL AUTO_INCREMENT,
+                              `type_id` INT unsigned NOT NULL DEFAULT 0,
+                              `name` varchar(255) NOT NULL DEFAULT '',
                               PRIMARY KEY (`id`),
                               KEY `categories_types_FK` (`type_id`),
                               CONSTRAINT `categories_types_FK` FOREIGN KEY (`type_id`) REFERENCES `types` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `items` (
-                         `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                         `category_id` int(11) unsigned DEFAULT NULL,
-                         `name` varchar(255) DEFAULT NULL,
-                         `date` date DEFAULT NULL,
-                         `description` text DEFAULT NULL,
-                         `sealed` tinyint(1) NOT NULL,
-                         `rate` smallint(5) unsigned NOT NULL DEFAULT 0,
-                         `box_id` int(11) unsigned DEFAULT 0,
+                         `id` INT unsigned NOT NULL AUTO_INCREMENT,
+                         `category_id` INT unsigned NOT NULL DEFAULT 0,
+                         `name` varchar(255) NOT NULL DEFAULT '',
+                         `date` date NOT NULL DEFAULT 0,
+                         `description` text NOT NULL DEFAULT '',
+                         `sealed` BOOL NOT NULL DEFAULT 0,
+                         `rate` TINYINT unsigned NOT NULL DEFAULT 0,
+                         `box_id` INT unsigned NOT NULL DEFAULT 0,
                          PRIMARY KEY (`id`),
                          KEY `items_boxes_FK` (`box_id`),
                          KEY `items_categories_FK` (`category_id`),

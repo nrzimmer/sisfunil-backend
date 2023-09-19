@@ -3,19 +3,17 @@
 diesel::table! {
     boxes (id) {
         id -> Unsigned<Integer>,
-        #[sql_name = "location_id"]
-        location -> Nullable<Unsigned<Integer>>,
-        description -> Nullable<Text>,
+        location_id -> Unsigned<Integer>,
+        description -> Text,
     }
 }
 
 diesel::table! {
     categories (id) {
         id -> Unsigned<Integer>,
-        #[sql_name = "type_id"]
-        item_type -> Nullable<Unsigned<Integer>>,
+        type_id -> Unsigned<Integer>,
         #[max_length = 255]
-        name -> Nullable<Varchar>,
+        name -> Varchar,
     }
 }
 
@@ -23,24 +21,21 @@ diesel::table! {
     groups (id) {
         id -> Unsigned<Integer>,
         #[max_length = 255]
-        name -> Nullable<Varchar>,
+        name -> Varchar,
     }
 }
 
 diesel::table! {
     items (id) {
         id -> Unsigned<Integer>,
-        #[sql_name = "category_id"]
-        category -> Nullable<Unsigned<Integer>>,
+        category_id -> Unsigned<Integer>,
         #[max_length = 255]
-        name -> Nullable<Varchar>,
-        date -> Nullable<Date>,
-        description -> Nullable<Text>,
+        name -> Varchar,
+        date -> Date,
+        description -> Text,
         sealed -> Bool,
-        #[sql_name = "rate"]
-        rating -> Unsigned<Smallint>,
-        #[sql_name = "box_id"]
-        item_box -> Nullable<Unsigned<Integer>>,
+        rate -> Unsigned<Tinyint>,
+        box_id -> Unsigned<Integer>,
     }
 }
 
@@ -48,26 +43,25 @@ diesel::table! {
     locations (id) {
         id -> Unsigned<Integer>,
         #[max_length = 255]
-        name -> Nullable<Varchar>,
-        description -> Nullable<Text>,
+        name -> Varchar,
+        description -> Text,
     }
 }
 
 diesel::table! {
     types (id) {
         id -> Unsigned<Integer>,
-        #[sql_name = "group_id"]
-        group -> Nullable<Unsigned<Integer>>,
+        group_id -> Unsigned<Integer>,
         #[max_length = 255]
-        name -> Nullable<Varchar>,
+        name -> Varchar,
     }
 }
 
-diesel::joinable!(boxes -> locations (location));
-diesel::joinable!(categories -> types (item_type));
-diesel::joinable!(items -> boxes (item_box));
-diesel::joinable!(items -> categories (category));
-diesel::joinable!(types -> groups (group));
+diesel::joinable!(boxes -> locations (location_id));
+diesel::joinable!(categories -> types (type_id));
+diesel::joinable!(items -> boxes (box_id));
+diesel::joinable!(items -> categories (category_id));
+diesel::joinable!(types -> groups (group_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     boxes,

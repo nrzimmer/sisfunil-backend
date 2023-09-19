@@ -1,14 +1,12 @@
 use serde::{Deserialize, Serialize};
 use diesel::prelude::*;
 
-use crate::models::group::Group;
-
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq, Deserialize, Serialize)]
+#[diesel(belongs_to(crate::models::group::Group))]
 #[diesel(table_name = crate::database::schema::types)]
 #[diesel(check_for_backend(diesel::mysql::Mysql))]
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ItemType {
+pub struct Type {
     pub id: u32,
     pub name: String,
-    pub group: Group,
+    pub group_id: u32,
 }
