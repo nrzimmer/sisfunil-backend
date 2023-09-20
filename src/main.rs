@@ -23,6 +23,7 @@ mod web {
 mod repositories {
     pub mod locations;
     pub mod groups;
+    pub mod containers;
 }
 
 mod database {
@@ -47,6 +48,8 @@ async fn main() -> io::Result<()> {
             .service(web::router::location_item)
             .service(web::router::group_list)
             .service(web::router::group_item)
+            .service(web::router::container_list)
+            .service(web::router::container_item)
     })
         .bind("0.0.0.0:9090")?
         .run()

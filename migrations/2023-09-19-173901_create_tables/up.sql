@@ -61,3 +61,6 @@ select * from equipefunil.locations;
 
 insert into funil.containers
 select * from equipefunil.boxes;
+
+insert into funil.groups
+select * from equipefunil.groups;
