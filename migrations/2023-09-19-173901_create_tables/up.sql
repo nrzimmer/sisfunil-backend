@@ -12,13 +12,13 @@ CREATE TABLE `locations` (
                              PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `boxes` (
+CREATE TABLE `containers` (
                          `id` INT unsigned NOT NULL AUTO_INCREMENT,
                          `location_id` INT unsigned NOT NULL DEFAULT 0,
                          `description` text NOT NULL DEFAULT '',
                          PRIMARY KEY (`id`),
-                         KEY `boxes_locations_FK` (`location_id`),
-                         CONSTRAINT `boxes_locations_FK` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`)
+                         KEY `containers_locations_FK` (`location_id`),
+                         CONSTRAINT `containers_locations_FK` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `types` (
@@ -48,10 +48,16 @@ CREATE TABLE `items` (
                          `description` text NOT NULL DEFAULT '',
                          `sealed` BOOL NOT NULL DEFAULT 0,
                          `rate` TINYINT unsigned NOT NULL DEFAULT 0,
-                         `box_id` INT unsigned NOT NULL DEFAULT 0,
+                         `container_id` INT unsigned NOT NULL DEFAULT 0,
                          PRIMARY KEY (`id`),
-                         KEY `items_boxes_FK` (`box_id`),
+                         KEY `items_boxes_FK` (`container_id`),
                          KEY `items_categories_FK` (`category_id`),
-                         CONSTRAINT `items_boxes_FK` FOREIGN KEY (`box_id`) REFERENCES `boxes` (`id`),
+                         CONSTRAINT `items_boxes_FK` FOREIGN KEY (`container_id`) REFERENCES `containers` (`id`),
                          CONSTRAINT `items_categories_FK` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+insert into funil.locations
+select * from equipefunil.locations;
+
+insert into funil.containers
+select * from equipefunil.boxes;

@@ -7,7 +7,7 @@ use crate::database::mysql::get_pool;
 
 mod models {
     pub mod group;
-    pub mod itembox;
+    pub mod container;
     pub mod itemtype;
     pub mod location;
     pub mod category;
@@ -21,7 +21,8 @@ mod web {
 }
 
 mod repositories {
-    pub mod location;
+    pub mod locations;
+    pub mod groups;
 }
 
 mod database {
@@ -44,6 +45,8 @@ async fn main() -> io::Result<()> {
             //.data(database::mysql::get_pool().clone())
             .service(web::router::location_list)
             .service(web::router::location_item)
+            .service(web::router::group_list)
+            .service(web::router::group_item)
     })
         .bind("0.0.0.0:9090")?
         .run()
