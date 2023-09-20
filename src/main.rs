@@ -1,7 +1,9 @@
-#[macro_use]
 extern crate actix_web;
+extern crate diesel;
+
 use std::{env, io};
 use actix_web::{App, HttpServer, middleware};
+use crate::database::mysql::get_pool;
 
 mod models {
     pub mod group;
@@ -13,12 +15,19 @@ mod models {
 }
 
 mod web {
-    pub mod items;
+    pub mod router;
+    pub mod types;
+    pub mod error;
+}
+
+mod repositories {
+    pub mod location;
 }
 
 mod database {
     pub mod mysql;
     pub mod schema;
+    pub mod types;
 }
 mod constants;
 mod response;
@@ -30,9 +39,11 @@ async fn main() -> io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .data(get_pool().clone())
             .wrap(middleware::Logger::default())
-            .data(database::mysql::get_pool().clone())
-            .service(web::items::list)
+            //.data(database::mysql::get_pool().clone())
+            .service(web::router::location_list)
+            .service(web::router::location_item)
     })
         .bind("0.0.0.0:9090")?
         .run()
