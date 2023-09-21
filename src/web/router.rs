@@ -2,7 +2,7 @@ use actix_web::{get, HttpResponse, web};
 use serde::Serialize;
 
 use crate::constants::APPLICATION_JSON;
-use crate::repositories::{containers, groups, locations, kinds};
+use crate::repositories::{containers, groups, locations, kinds, categories};
 use crate::web::error::diesel_error;
 
 use super::types::WDPool;
@@ -63,7 +63,7 @@ pub async fn container_item(item_id: web::Path<u32>, pool: WDPool) -> HttpRespon
 
 
 #[get("/kind")]
-pub async fn type_list(pool: WDPool) -> HttpResponse {
+pub async fn kind_list(pool: WDPool) -> HttpResponse {
     match kinds::find_all(&pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
@@ -71,8 +71,25 @@ pub async fn type_list(pool: WDPool) -> HttpResponse {
 }
 
 #[get("/kind/{id}")]
-pub async fn type_item(item_id: web::Path<u32>, pool: WDPool) -> HttpResponse {
+pub async fn kind_item(item_id: web::Path<u32>, pool: WDPool) -> HttpResponse {
     match kinds::find_by_id(item_id.into_inner(), &pool) {
+        Ok(v) => http_ok_json(v),
+        Err(e) => diesel_error(e),
+    }
+}
+
+
+#[get("/category")]
+pub async fn category_list(pool: WDPool) -> HttpResponse {
+    match categories::find_all(&pool) {
+        Ok(v) => http_ok_json(v),
+        Err(e) => diesel_error(e),
+    }
+}
+
+#[get("/category/{id}")]
+pub async fn category_item(item_id: web::Path<u32>, pool: WDPool) -> HttpResponse {
+    match categories::find_by_id(item_id.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
     }

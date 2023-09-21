@@ -26,6 +26,7 @@ mod repositories {
     pub mod locations;
     pub mod groups;
     pub mod kinds;
+    pub mod categories;
     pub mod containers;
 }
 
@@ -53,6 +54,10 @@ async fn main() -> io::Result<()> {
             .service(web::router::group_item)
             .service(web::router::container_list)
             .service(web::router::container_item)
+            .service(web::router::category_item)
+            .service(web::router::category_list)
+            .service(web::router::kind_item)
+            .service(web::router::kind_list)
     })
         .bind("0.0.0.0:9090")?
         .run()
