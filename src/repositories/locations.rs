@@ -1,7 +1,8 @@
-use diesel::{QueryResult, RunQueryDsl, QueryDsl, ExpressionMethods};
-use crate::web::types::WDPool;
-use crate::models::location::Location;
+use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+
 use crate::database::schema::locations::dsl::*;
+use crate::models::location::Location;
+use crate::web::types::WDPool;
 
 pub fn find_all(pool: &WDPool) -> QueryResult<Vec<Location>> {
     let conn = &mut pool.get().unwrap();

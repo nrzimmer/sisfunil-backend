@@ -1,5 +1,5 @@
+use diesel::prelude::{Identifiable, Queryable, Selectable};
 use serde::{Deserialize, Serialize};
-use diesel::prelude::{Queryable, Identifiable, Selectable};
 
 #[derive(Queryable, Identifiable, Selectable, Debug, PartialEq, Deserialize, Serialize)]
 #[diesel(table_name = crate::database::schema::locations)]

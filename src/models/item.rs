@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
-use serde::{Deserialize, Serialize};
 use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq, Deserialize, Serialize)]
 #[diesel(belongs_to(crate::models::container::Container))]

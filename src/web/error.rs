@@ -1,11 +1,12 @@
 use std::error::Error;
+
 use actix_web::HttpResponse;
 use diesel::NotFound;
-use serde::{Serialize};
+use serde::Serialize;
 
 #[derive(Serialize)]
 struct __Error {
-    pub error: String
+    pub error: String,
 }
 
 pub fn diesel_error(e: diesel::result::Error) -> HttpResponse {

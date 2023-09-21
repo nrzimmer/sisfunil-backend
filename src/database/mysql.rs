@@ -1,5 +1,7 @@
 use std::env;
+
 use dotenvy::dotenv;
+
 use super::types::*;
 
 pub fn get_pool() -> DBPool {

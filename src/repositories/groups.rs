@@ -1,7 +1,8 @@
-use diesel::{QueryResult, RunQueryDsl, QueryDsl, ExpressionMethods};
-use crate::web::types::WDPool;
-use crate::models::group::Group;
+use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+
 use crate::database::schema::groups::dsl::*;
+use crate::models::group::Group;
+use crate::web::types::WDPool;
 
 pub fn find_all(pool: &WDPool) -> QueryResult<Vec<Group>> {
     let conn = &mut pool.get().unwrap();

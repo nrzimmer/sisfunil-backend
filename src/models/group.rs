@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Identifiable, Selectable, Debug, PartialEq, Deserialize, Serialize)]
 #[diesel(table_name = crate::database::schema::groups)]

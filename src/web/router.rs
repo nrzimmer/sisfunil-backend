@@ -1,9 +1,10 @@
-use actix_web::{get, web, HttpResponse};
+use actix_web::{get, HttpResponse, web};
 use serde::Serialize;
 
 use crate::constants::APPLICATION_JSON;
-use crate::web::error::diesel_error;
 use crate::repositories::{containers, groups, locations};
+use crate::web::error::diesel_error;
+
 use super::types::WDPool;
 
 fn http_ok_json<T: Serialize>(json: T) -> HttpResponse {
@@ -56,7 +57,6 @@ pub async fn container_list(pool: WDPool) -> HttpResponse {
 pub async fn container_item(item_id: web::Path<u32>, pool: WDPool) -> HttpResponse {
     match containers::find_by_id(item_id.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
-        Err(e) => { let a = e;
-            diesel_error(a) },
+        Err(e) => diesel_error(e),
     }
 }
