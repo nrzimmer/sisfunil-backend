@@ -3,7 +3,7 @@
 diesel::table! {
     categories (id) {
         id -> Unsigned<Integer>,
-        type_id -> Unsigned<Integer>,
+        kind_id -> Unsigned<Integer>,
         #[max_length = 255]
         name -> Varchar,
     }
@@ -40,6 +40,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    kinds (id) {
+        id -> Unsigned<Integer>,
+        group_id -> Unsigned<Integer>,
+        #[max_length = 255]
+        name -> Varchar,
+    }
+}
+
+diesel::table! {
     locations (id) {
         id -> Unsigned<Integer>,
         #[max_length = 255]
@@ -48,26 +57,17 @@ diesel::table! {
     }
 }
 
-diesel::table! {
-    types (id) {
-        id -> Unsigned<Integer>,
-        group_id -> Unsigned<Integer>,
-        #[max_length = 255]
-        name -> Varchar,
-    }
-}
-
-diesel::joinable!(categories -> types (type_id));
+diesel::joinable!(categories -> kinds (kind_id));
 diesel::joinable!(containers -> locations (location_id));
 diesel::joinable!(items -> categories (category_id));
 diesel::joinable!(items -> containers (container_id));
-diesel::joinable!(types -> groups (group_id));
+diesel::joinable!(kinds -> groups (group_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     categories,
     containers,
     groups,
     items,
+    kinds,
     locations,
-    types,
 );

@@ -10,7 +10,7 @@ use crate::database::mysql::get_pool;
 mod models {
     pub mod group;
     pub mod container;
-    pub mod itemtype;
+    pub mod kind;
     pub mod location;
     pub mod category;
     pub mod item;
@@ -25,6 +25,7 @@ mod web {
 mod repositories {
     pub mod locations;
     pub mod groups;
+    pub mod kinds;
     pub mod containers;
 }
 

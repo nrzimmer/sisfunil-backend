@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS `items`;
 DROP TABLE IF EXISTS `categories`;
 DROP TABLE IF EXISTS `types`;
+DROP TABLE IF EXISTS `kinds`;
 DROP TABLE IF EXISTS `containers`;
 DROP TABLE IF EXISTS `locations`;
 DROP TABLE IF EXISTS `groups`;
@@ -28,23 +29,23 @@ CREATE TABLE `containers` (
                          CONSTRAINT `containers_locations_FK` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `types` (
+CREATE TABLE `kinds` (
                          `id` INT unsigned NOT NULL AUTO_INCREMENT,
                          `group_id` INT unsigned NOT NULL DEFAULT 0,
                          `name` varchar(255) NOT NULL DEFAULT '',
                          PRIMARY KEY (`id`),
-                         UNIQUE KEY `types_name_UN` (`name`),
-                         KEY `types_groups_FK` (`group_id`),
-                         CONSTRAINT `types_groups_FK` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`)
+                         UNIQUE KEY `kinds_name_UN` (`name`),
+                         KEY `kinds_groups_FK` (`group_id`),
+                         CONSTRAINT `kinds_groups_FK` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `categories` (
                               `id` INT unsigned NOT NULL AUTO_INCREMENT,
-                              `type_id` INT unsigned NOT NULL DEFAULT 0,
+                              `kind_id` INT unsigned NOT NULL DEFAULT 0,
                               `name` varchar(255) NOT NULL DEFAULT '',
                               PRIMARY KEY (`id`),
-                              KEY `categories_types_FK` (`type_id`),
-                              CONSTRAINT `categories_types_FK` FOREIGN KEY (`type_id`) REFERENCES `types` (`id`)
+                              KEY `categories_kinds_FK` (`kind_id`),
+                              CONSTRAINT `categories_kinds_FK` FOREIGN KEY (`kind_id`) REFERENCES `kinds` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `items` (
@@ -71,3 +72,9 @@ select * from equipefunil.boxes;
 
 insert into funil.groups
 select * from equipefunil.groups;
+
+insert into funil.kinds
+select * from equipefunil.types;
+
+insert into funil.categories
+select * from equipefunil.categories;
