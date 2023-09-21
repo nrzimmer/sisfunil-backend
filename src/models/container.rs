@@ -8,5 +8,14 @@ use serde::{Deserialize, Serialize};
 pub struct Container {
     pub id: u32,
     pub description: String,
+    #[serde(skip)]
     pub location_id: u32,
+}
+
+pub fn missing() -> Container {
+    Container {
+        id: 0,
+        description: "Not found".to_string(),
+        location_id: 0
+    }
 }

@@ -11,9 +11,11 @@ pub struct Item {
     pub id: u32,
     pub name: String,
     pub description: String,
+    #[serde(skip)]
     pub category_id: u32,
     pub date: NaiveDate,
     pub sealed: bool,
     pub rate: u8,
+    #[serde(skip)]
     pub container_id: u32,
 }

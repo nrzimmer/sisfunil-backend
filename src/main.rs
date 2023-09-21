@@ -28,7 +28,10 @@ mod repositories {
     pub mod kinds;
     pub mod categories;
     pub mod containers;
+    pub mod items;
 }
+
+mod dto {}
 
 mod database {
     pub mod mysql;
@@ -38,6 +41,7 @@ mod database {
 
 mod constants;
 mod response;
+pub mod dtos;
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
@@ -58,6 +62,8 @@ async fn main() -> io::Result<()> {
             .service(web::router::category_list)
             .service(web::router::kind_item)
             .service(web::router::kind_list)
+            .service(web::router::item_all)
+            .service(web::router::item)
     })
         .bind("0.0.0.0:9090")?
         .run()

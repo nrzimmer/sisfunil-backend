@@ -8,5 +8,14 @@ use serde::{Deserialize, Serialize};
 pub struct Category {
     pub id: u32,
     pub name: String,
+    #[serde(skip)]
     pub kind_id: u32,
+}
+
+pub fn missing() -> Category {
+    Category {
+        id: 0,
+        name: "Not found".to_string(),
+        kind_id: 0
+    }
 }

@@ -78,3 +78,6 @@ select * from equipefunil.types;
 
 insert into funil.categories
 select * from equipefunil.categories;
+
+insert into funil.items
+select * from equipefunil.items;

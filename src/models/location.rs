@@ -9,3 +9,11 @@ pub struct Location {
     pub name: String,
     pub description: String,
 }
+
+pub fn missing() -> Location {
+    Location {
+        id: 0,
+        name: "Not found".to_string(),
+        description: "Not found".to_string(),
+    }
+}

@@ -8,3 +8,10 @@ pub struct Group {
     pub id: u32,
     pub name: String,
 }
+
+pub fn missing() -> Group {
+    Group {
+        id: 0,
+        name: "Not found".to_string(),
+    }
+}
