@@ -16,6 +16,6 @@ pub fn missing() -> Category {
     Category {
         id: 0,
         name: "Not found".to_string(),
-        kind_id: 0
+        kind_id: 0,
     }
 }

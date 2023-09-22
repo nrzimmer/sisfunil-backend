@@ -16,6 +16,6 @@ pub fn missing() -> Container {
     Container {
         id: 0,
         description: "Not found".to_string(),
-        location_id: 0
+        location_id: 0,
     }
 }

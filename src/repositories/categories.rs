@@ -1,20 +1,25 @@
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SelectableHelper};
 
-use crate::database::schema::{kinds, groups, categories};
+use crate::database::schema::{categories, groups, kinds};
 use crate::dtos::{CategoryDTO, KindDTO};
 use crate::models::{group, kind};
-
 use crate::models::category::Category;
 use crate::models::group::Group;
 use crate::models::kind::Kind;
+use crate::web::router::Pageable;
 use crate::web::types::WDPool;
 
-pub fn find_all(pool: &WDPool) -> QueryResult<Vec<CategoryDTO>> {
+pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<CategoryDTO>> {
     let conn = &mut pool.get().unwrap();
+    let limit = page.size.unwrap_or(50);
+    let offset = page.start.unwrap_or(0) * limit;
+
     let result = categories::table
         .left_join(kinds::table
             .left_join(groups::table)
         )
+        .limit(limit.into())
+        .offset(offset.into())
         .select((Category::as_select(), Option::<Kind>::as_select(), Option::<Group>::as_select()))
         .get_results(conn);
 

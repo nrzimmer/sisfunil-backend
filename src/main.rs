@@ -22,6 +22,7 @@ mod web {
     pub mod error;
 }
 
+
 mod repositories {
     pub mod locations;
     pub mod groups;
@@ -40,7 +41,6 @@ mod database {
 }
 
 mod constants;
-mod response;
 pub mod dtos;
 
 #[actix_rt::main]
