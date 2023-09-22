@@ -1,11 +1,3 @@
-DROP TABLE IF EXISTS `items`;
-DROP TABLE IF EXISTS `categories`;
-DROP TABLE IF EXISTS `types`;
-DROP TABLE IF EXISTS `kinds`;
-DROP TABLE IF EXISTS `containers`;
-DROP TABLE IF EXISTS `locations`;
-DROP TABLE IF EXISTS `groups`;
-
 CREATE TABLE `groups` (
                           `id` INT unsigned NOT NULL AUTO_INCREMENT,
                           `name` varchar(255) NOT NULL DEFAULT '',
