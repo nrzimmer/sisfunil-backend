@@ -20,8 +20,8 @@ fn http_ok_json<T: Serialize>(json: T) -> HttpResponse {
 }
 
 #[get("/location")]
-pub async fn location_list(pool: WDPool) -> HttpResponse {
-    match locations::find_all(&pool) {
+pub async fn location_list(page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+    match locations::find_all(page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
     }
@@ -36,8 +36,8 @@ pub async fn location_item(item_id: web::Path<u32>, pool: WDPool) -> HttpRespons
 }
 
 #[get("/group")]
-pub async fn group_list(pool: WDPool) -> HttpResponse {
-    match groups::find_all(&pool) {
+pub async fn group_list(page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+    match groups::find_all(page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
     }
@@ -52,8 +52,8 @@ pub async fn group_item(item_id: web::Path<u32>, pool: WDPool) -> HttpResponse {
 }
 
 #[get("/container")]
-pub async fn container_list(pool: WDPool) -> HttpResponse {
-    match containers::find_all(&pool) {
+pub async fn container_list(page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+    match containers::find_all(page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
     }
@@ -68,8 +68,8 @@ pub async fn container_item(item_id: web::Path<u32>, pool: WDPool) -> HttpRespon
 }
 
 #[get("/kind")]
-pub async fn kind_list(pool: WDPool) -> HttpResponse {
-    match kinds::find_all(&pool) {
+pub async fn kind_list(page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+    match kinds::find_all(page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
     }
@@ -84,8 +84,8 @@ pub async fn kind_item(item_id: web::Path<u32>, pool: WDPool) -> HttpResponse {
 }
 
 #[get("/category")]
-pub async fn category_list(pool: WDPool) -> HttpResponse {
-    match categories::find_all(&pool) {
+pub async fn category_list(page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+    match categories::find_all(page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
     }
