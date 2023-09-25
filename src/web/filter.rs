@@ -2,16 +2,19 @@ use regex::Regex;
 use serde::Deserialize;
 
 #[macro_export]
-macro_rules! get_filters {
-    ($filter:expr, $table:ty, $field:expr) => {
-        {
-        let mut words = $filter.words.clone();
-        let first = Box::new($field.like(format!("%{}%", words.pop().unwrap())));
-        let result: Box<dyn BoxableExpression<$table, _, SqlType=Bool>> =
+macro_rules! gen_filter_fn {
+    ($func_name:tt, $filter_field_ty:ty, $filter_field_expr:expr) => {
+fn $func_name<T: 'static>(filter: Filter) -> Box<dyn BoxableExpression<T, Mysql, SqlType=Bool>>
+where
+    diesel::dsl::Like<$filter_field_ty, &'static str>: BoxableExpression<T, Mysql, SqlType=Bool>, $filter_field_ty: SelectableExpression<T>
+{
+    let mut words = filter.words.clone();
+    let first = Box::new($filter_field_expr.like(format!("%{}%", words.pop().unwrap())));
+    let result: Box<dyn BoxableExpression<T, Mysql, SqlType=Bool>> =
         words
             .into_iter()
             .map(|word|
-                $field.like(format!("%{}%", word))
+                $filter_field_expr.like(format!("%{}%", word))
             )
             .fold(
                 first,
@@ -19,9 +22,9 @@ macro_rules! get_filters {
                     Box::new(predicate.and(next_predicate))
                 },
             );
-        result
-        }
-    }
+    result
+}
+    };
 }
 
 #[derive(Debug, Deserialize)]
@@ -33,6 +36,7 @@ pub trait ToFilter {
     fn to_filter(&self) -> Filter;
 }
 
+#[derive(Clone)]
 pub struct Filter {
     pub words: Vec<String>,
 }

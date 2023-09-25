@@ -1,13 +1,17 @@
-use diesel::{BoolExpressionMethods, BoxableExpression, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SelectableHelper, TextExpressionMethods};
+use diesel::{BoolExpressionMethods, BoxableExpression, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SelectableExpression, SelectableHelper, TextExpressionMethods};
+use diesel::mysql::Mysql;
 use diesel::sql_types::Bool;
 
-use crate::database::schema::locations;
-use crate::get_filters;
+use crate::gen_filter_fn;
 use crate::apply_pageable;
+use crate::database::schema::locations;
 use crate::models::location::Location;
 use crate::web::filter::Filter;
 use crate::web::pageable::Pageable;
 use crate::web::types::WDPool;
+
+gen_filter_fn!(get_filters_name, locations::name, locations::name);
+gen_filter_fn!(get_filters_description, locations::description, locations::description);
 
 pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<Location>> {
     let conn = &mut pool.get().unwrap();
@@ -16,7 +20,6 @@ pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<Location>> {
         .select(Location::as_select()).into_boxed();
 
     select = apply_pageable!(select, page);
-
     select.load::<Location>(conn)
 }
 
@@ -27,13 +30,12 @@ pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<
         .select(Location::as_select()).into_boxed();
 
     if !filter.words.is_empty() {
-        let name = get_filters!(filter, locations::table, locations::name);
-        let description = get_filters!(filter, locations::table, locations::description);
+        let name = get_filters_name(filter.clone());
+        let description = get_filters_description(filter);
         select = select.filter(name.or(description));
     }
 
     select = apply_pageable!(select, page);
-
     select.load::<Location>(conn)
 }
 

@@ -1,13 +1,19 @@
-use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SelectableHelper};
+use diesel::{BoolExpressionMethods, BoxableExpression, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SelectableExpression, SelectableHelper, TextExpressionMethods};
+use diesel::mysql::Mysql;
+use diesel::sql_types::Bool;
 
+use crate::{apply_pageable, gen_filter_fn};
 use crate::database::schema::{categories, groups, kinds};
 use crate::dtos::{CategoryDTO, KindDTO};
 use crate::models::{group, kind};
 use crate::models::category::Category;
 use crate::models::group::Group;
 use crate::models::kind::Kind;
+use crate::web::filter::Filter;
 use crate::web::pageable::Pageable;
 use crate::web::types::WDPool;
+
+gen_filter_fn!(get_filters, categories::name, categories::name);
 
 macro_rules! get_select {
     () => {
@@ -35,12 +41,11 @@ fn to_category_dto(category: Category, kind: Option<Kind>, group: Option<Group>)
 
 pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<CategoryDTO>> {
     let conn = &mut pool.get().unwrap();
-    let limit = page.size.unwrap_or(50);
-    let offset = page.start.unwrap_or(0) * limit;
 
-    let result = get_select!()
-        .limit(limit.into())
-        .offset(offset.into())
+    let select = get_select!()
+        .into_boxed();
+
+    let result = apply_pageable!(select, page)
         .get_results(conn);
 
     match result {
@@ -51,6 +56,27 @@ pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<CategoryDTO>> 
     }
 }
 
+pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<CategoryDTO>> {
+    let conn = &mut pool.get().unwrap();
+
+    let mut select = get_select!()
+        .into_boxed();
+
+    if !filter.words.is_empty() {
+        let name = get_filters(filter);
+        select = select.filter(name);
+    }
+
+    let result = apply_pageable!(select, page)
+        .get_results(conn);
+
+    match result {
+        Ok(v) => Ok(v.into_iter()
+            .map(|(category, kind, group)| to_category_dto(category, kind, group))
+            .collect::<Vec<CategoryDTO>>()),
+        Err(e) => Err(e),
+    }
+}
 
 pub fn find_by_id(category_id: u32, pool: &WDPool) -> QueryResult<CategoryDTO> {
     let conn = &mut pool.get().unwrap();
