@@ -1,4 +1,5 @@
 use diesel::mysql::Mysql;
+use diesel::result::Error;
 use diesel::sql_types::Bool;
 use diesel::{
     BoolExpressionMethods, BoxableExpression, ExpressionMethods, QueryDsl, QueryResult,
@@ -19,19 +20,25 @@ use crate::web::pageable::Pageable;
 use crate::web::types::WDPool;
 use crate::{apply_pageable, gen_filters_fn};
 
-macro_rules! get_select {
+macro_rules! get_boxed {
     () => {
         items::table
             .left_join(categories::table.left_join(kinds::table.left_join(groups::table)))
             .left_join(containers::table.left_join(locations::table))
-            .select((
-                Item::as_select(),
-                Option::<Container>::as_select(),
-                Option::<Location>::as_select(),
-                Option::<Category>::as_select(),
-                Option::<Kind>::as_select(),
-                Option::<Group>::as_select(),
-            ))
+            .into_boxed()
+    };
+}
+
+macro_rules! apply_select {
+    ($fun:expr) => {
+        $fun.select((
+            Item::as_select(),
+            Option::<Container>::as_select(),
+            Option::<Location>::as_select(),
+            Option::<Category>::as_select(),
+            Option::<Kind>::as_select(),
+            Option::<Group>::as_select(),
+        ))
     };
 }
 
@@ -67,39 +74,60 @@ fn to_item_dto(
     }
 }
 
-pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<ItemDTO>> {
+pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResultDTO<ItemDTO> {
     let conn = &mut pool.get().unwrap();
 
-    let select = get_select!().into_boxed();
+    let select = get_boxed!();
 
-    let result = apply_pageable!(select, page)
+    let result = apply_select!(apply_pageable!(select, page))
         .order_by(items::id)
         .get_results(conn);
 
-    match result {
-        Ok(v) => Ok(v
-            .into_iter()
-            .map(|(item, container, location, category, kind, group)| {
-                to_item_dto(item, container, location, category, kind, group)
-            })
-            .collect::<Vec<ItemDTO>>()),
-        Err(e) => Err(e),
-    }
+    let data = match_result(result);
+
+    let count = get_boxed!().count().get_result(conn);
+
+    get_results_dto(data, count)
 }
 
-pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<ItemDTO>> {
+pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResultDTO<ItemDTO> {
     let conn = &mut pool.get().unwrap();
 
-    let mut select = get_select!().into_boxed();
+    let mut select = get_boxed!();
+
+    if !filter.words.is_empty() {
+        select = select.filter(get_filters(filter.clone()));
+    }
+
+    let result = apply_select!(apply_pageable!(select, page))
+        .order_by(items::id)
+        .get_results(conn);
+
+    let data = match_result(result);
+
+    let mut select = get_boxed!();
 
     if !filter.words.is_empty() {
         select = select.filter(get_filters(filter));
     }
 
-    let result = apply_pageable!(select, page)
-        .order_by(items::id)
-        .get_results(conn);
+    let count = select.count().get_result(conn);
 
+    get_results_dto(data, count)
+}
+
+fn match_result(
+    result: QueryResult<
+        Vec<(
+            Item,
+            Option<Container>,
+            Option<Location>,
+            Option<Category>,
+            Option<Kind>,
+            Option<Group>,
+        )>,
+    >,
+) -> Result<Vec<ItemDTO>, Error> {
     match result {
         Ok(v) => Ok(v
             .into_iter()
@@ -111,11 +139,11 @@ pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<
     }
 }
 
-pub fn find_by_id(item_id: u32, pool: &WDPool) -> QueryResult<ItemDTO> {
+pub fn find_by_id(item_id: u32, pool: &WDPool) -> QueryResultDTO<ItemDTO> {
     //QueryResult<(Item, Container, Location)> {
     let conn = &mut pool.get().unwrap();
 
-    get_select!()
+    let data = apply_select!(get_boxed!())
         .filter(items::id.eq(item_id))
         .first::<(
             Item,
@@ -127,5 +155,7 @@ pub fn find_by_id(item_id: u32, pool: &WDPool) -> QueryResult<ItemDTO> {
         )>(conn)
         .map(|(item, container, location, category, kind, group)| {
             to_item_dto(item, container, location, category, kind, group)
-        })
+        });
+
+    get_result_dto(data)
 }

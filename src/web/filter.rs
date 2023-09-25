@@ -84,9 +84,9 @@ impl ToFilter for FilterConfig {
 
         for capture in re.captures_iter(self.filter.as_str()) {
             if let Some(quoted_word) = capture.get(1) {
-                captured_words.push(quoted_word.as_str().to_string()); // Add the word within quotes to the Vec
+                captured_words.push(quoted_word.as_str().to_string());
             } else if let Some(word) = capture.get(2) {
-                captured_words.push(word.as_str().to_string()); // Add the standalone word to the Vec
+                captured_words.push(word.as_str().to_string());
             }
         }
 

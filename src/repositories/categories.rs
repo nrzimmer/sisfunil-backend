@@ -1,4 +1,5 @@
 use diesel::mysql::Mysql;
+use diesel::result::Error;
 use diesel::sql_types::Bool;
 use diesel::{
     BoolExpressionMethods, BoxableExpression, ExpressionMethods, QueryDsl, QueryResult,
@@ -6,7 +7,7 @@ use diesel::{
 };
 
 use crate::database::schema::{categories, groups, kinds};
-use crate::dtos::{CategoryDTO, KindDTO};
+use crate::dtos::{get_result_dto, get_results_dto, CategoryDTO, KindDTO, QueryResultDTO};
 use crate::models::category::Category;
 use crate::models::group::Group;
 use crate::models::kind::Kind;
@@ -18,15 +19,21 @@ use crate::{apply_pageable, gen_filter_fn};
 
 gen_filter_fn!(get_filters, categories::name, categories::name);
 
-macro_rules! get_select {
+macro_rules! get_boxed {
     () => {
         categories::table
             .left_join(kinds::table.left_join(groups::table))
-            .select((
-                Category::as_select(),
-                Option::<Kind>::as_select(),
-                Option::<Group>::as_select(),
-            ))
+            .into_boxed()
+    };
+}
+
+macro_rules! apply_select {
+    ($fun:expr) => {
+        $fun.select((
+            Category::as_select(),
+            Option::<Kind>::as_select(),
+            Option::<Group>::as_select(),
+        ))
     };
 }
 
@@ -40,15 +47,22 @@ fn to_category_dto(category: Category, kind: Option<Kind>, group: Option<Group>)
     }
 }
 
-pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<CategoryDTO>> {
+pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResultDTO<CategoryDTO> {
     let conn = &mut pool.get().unwrap();
 
-    let select = get_select!().into_boxed();
-
-    let result = apply_pageable!(select, page)
-        .order_by(categories::id)
+    let result = apply_select!(apply_pageable!(get_boxed!(), page).order_by(categories::id))
         .get_results(conn);
 
+    let data = match_result(result);
+
+    let count = get_boxed!().count().get_result(conn);
+
+    get_results_dto(data, count)
+}
+
+fn match_result(
+    result: QueryResult<Vec<(Category, Option<Kind>, Option<Group>)>>,
+) -> Result<Vec<CategoryDTO>, Error> {
     match result {
         Ok(v) => Ok(v
             .into_iter()
@@ -58,10 +72,10 @@ pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<CategoryDTO>> 
     }
 }
 
-pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<CategoryDTO>> {
+pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResultDTO<CategoryDTO> {
     let conn = &mut pool.get().unwrap();
 
-    let mut select = get_select!().into_boxed();
+    let mut select = apply_select!(get_boxed!());
 
     if !filter.words.is_empty() {
         let name = get_filters(filter);
@@ -72,20 +86,20 @@ pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<
         .order_by(categories::id)
         .get_results(conn);
 
-    match result {
-        Ok(v) => Ok(v
-            .into_iter()
-            .map(|(category, kind, group)| to_category_dto(category, kind, group))
-            .collect::<Vec<CategoryDTO>>()),
-        Err(e) => Err(e),
-    }
+    let data = match_result(result);
+
+    let count = get_boxed!().count().get_result(conn);
+
+    get_results_dto(data, count)
 }
 
-pub fn find_by_id(category_id: u32, pool: &WDPool) -> QueryResult<CategoryDTO> {
+pub fn find_by_id(category_id: u32, pool: &WDPool) -> QueryResultDTO<CategoryDTO> {
     let conn = &mut pool.get().unwrap();
 
-    get_select!()
+    let data = apply_select!(get_boxed!())
         .filter(categories::id.eq(category_id))
         .first::<(Category, Option<Kind>, Option<Group>)>(conn)
-        .map(|(category, kind, group)| to_category_dto(category, kind, group))
+        .map(|(category, kind, group)| to_category_dto(category, kind, group));
+
+    get_result_dto(data)
 }
