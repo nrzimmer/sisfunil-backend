@@ -20,6 +20,8 @@ mod web {
     pub mod router;
     pub mod types;
     pub mod error;
+    pub mod filter;
+    pub mod pageable;
 }
 
 
@@ -53,6 +55,7 @@ async fn main() -> io::Result<()> {
             .data(get_pool().clone())
             .wrap(middleware::Logger::default())
             .service(web::router::location_list)
+            .service(web::router::location_search)
             .service(web::router::location_item)
             .service(web::router::group_list)
             .service(web::router::group_item)

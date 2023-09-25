@@ -1,17 +1,13 @@
 use actix_web::{get, HttpResponse, web};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::constants::APPLICATION_JSON;
 use crate::repositories::{categories, containers, groups, items, kinds, locations};
 use crate::web::error::diesel_error;
+use crate::web::filter::{FilterConfig, ToFilter};
+use crate::web::pageable::Pageable;
 
 use super::types::WDPool;
-
-#[derive(Debug, Deserialize)]
-pub struct Pageable {
-    pub start: Option<u32>,
-    pub size: Option<u32>,
-}
 
 fn http_ok_json<T: Serialize>(json: T) -> HttpResponse {
     HttpResponse::Ok()
@@ -22,6 +18,14 @@ fn http_ok_json<T: Serialize>(json: T) -> HttpResponse {
 #[get("/location")]
 pub async fn location_list(page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
     match locations::find_all(page.into_inner(), &pool) {
+        Ok(v) => http_ok_json(v),
+        Err(e) => diesel_error(e),
+    }
+}
+
+#[get("/location/search")]
+pub async fn location_search(words: web::Query<FilterConfig>, page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+    match locations::search(words.into_inner().to_filter(), page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
     }

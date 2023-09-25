@@ -370,6 +370,7 @@ dependencies = [
  "diesel",
  "dotenvy",
  "env_logger",
+ "regex",
  "serde",
  "serde_json",
  "uuid",

@@ -5,7 +5,7 @@ use crate::dtos::ContainerDTO;
 use crate::models::container::Container;
 use crate::models::location;
 use crate::models::location::Location;
-use crate::web::router::Pageable;
+use crate::web::pageable::Pageable;
 use crate::web::types::WDPool;
 
 macro_rules! get_select {

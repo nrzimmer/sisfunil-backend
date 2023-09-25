@@ -9,7 +9,7 @@ use crate::models::group::Group;
 use crate::models::item::Item;
 use crate::models::kind::Kind;
 use crate::models::location::Location;
-use crate::web::router::Pageable;
+use crate::web::pageable::Pageable;
 use crate::web::types::WDPool;
 
 macro_rules! get_select {
