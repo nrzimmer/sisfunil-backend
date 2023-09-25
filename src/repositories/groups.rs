@@ -17,10 +17,11 @@ gen_filter_fn!(get_filter, groups::name, groups::name);
 pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<Group>> {
     let conn = &mut pool.get().unwrap();
 
-    let mut select = groups::table.select(Group::as_select()).into_boxed();
+    let select = groups::table.select(Group::as_select()).into_boxed();
 
-    select = apply_pageable!(select, page);
-    select.load::<Group>(conn)
+    apply_pageable!(select, page)
+        .order_by(groups::id)
+        .load::<Group>(conn)
 }
 
 pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<Group>> {
@@ -33,8 +34,9 @@ pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<
         select = select.filter(name);
     }
 
-    select = apply_pageable!(select, page);
-    select.load::<Group>(conn)
+    apply_pageable!(select, page)
+        .order_by(groups::id)
+        .load::<Group>(conn)
 }
 
 pub fn find_by_id(group_id: u32, pool: &WDPool) -> QueryResult<Group> {

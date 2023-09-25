@@ -24,10 +24,11 @@ gen_filters_fn!(
 pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<Location>> {
     let conn = &mut pool.get().unwrap();
 
-    let mut select = locations::table.select(Location::as_select()).into_boxed();
+    let select = locations::table.select(Location::as_select()).into_boxed();
 
-    select = apply_pageable!(select, page);
-    select.load::<Location>(conn)
+    apply_pageable!(select, page)
+        .order_by(locations::id)
+        .load::<Location>(conn)
 }
 
 pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<Location>> {
@@ -39,8 +40,9 @@ pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<
         select = select.filter(get_filters(filter));
     }
 
-    select = apply_pageable!(select, page);
-    select.load::<Location>(conn)
+    apply_pageable!(select, page)
+        .order_by(locations::id)
+        .load::<Location>(conn)
 }
 
 pub fn find_by_id(location_id: u32, pool: &WDPool) -> QueryResult<Location> {

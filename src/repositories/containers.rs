@@ -41,7 +41,9 @@ pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<ContainerDTO>>
 
     let select = get_select!().into_boxed();
 
-    let result = apply_pageable!(select, page).get_results(conn);
+    let result = apply_pageable!(select, page)
+        .order_by(containers::id)
+        .get_results(conn);
 
     match result {
         Ok(v) => Ok(v
@@ -62,7 +64,9 @@ pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<
         select = select.filter(name);
     }
 
-    let result = apply_pageable!(select, page).get_results(conn);
+    let result = apply_pageable!(select, page)
+        .order_by(containers::id)
+        .get_results(conn);
 
     match result {
         Ok(v) => Ok(v
