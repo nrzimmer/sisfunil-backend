@@ -1,7 +1,10 @@
-use diesel::{BoolExpressionMethods, BoxableExpression, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SelectableExpression, SelectableHelper, TextExpressionMethods};
+use crate::{apply_pageable, gen_filter_fn};
 use diesel::mysql::Mysql;
 use diesel::sql_types::Bool;
-use crate::{apply_pageable, gen_filter_fn};
+use diesel::{
+    BoolExpressionMethods, BoxableExpression, ExpressionMethods, QueryDsl, QueryResult,
+    RunQueryDsl, SelectableExpression, SelectableHelper, TextExpressionMethods,
+};
 
 use crate::database::schema::groups;
 use crate::models::group::Group;
@@ -14,8 +17,7 @@ gen_filter_fn!(get_filter, groups::name, groups::name);
 pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<Group>> {
     let conn = &mut pool.get().unwrap();
 
-    let mut select = groups::table
-        .select(Group::as_select()).into_boxed();
+    let mut select = groups::table.select(Group::as_select()).into_boxed();
 
     select = apply_pageable!(select, page);
     select.load::<Group>(conn)
@@ -24,8 +26,7 @@ pub fn find_all(page: Pageable, pool: &WDPool) -> QueryResult<Vec<Group>> {
 pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<Group>> {
     let conn = &mut pool.get().unwrap();
 
-    let mut select = groups::table
-        .select(Group::as_select()).into_boxed();
+    let mut select = groups::table.select(Group::as_select()).into_boxed();
 
     if !filter.words.is_empty() {
         let name = get_filter(filter);

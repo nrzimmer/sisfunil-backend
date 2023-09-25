@@ -2,7 +2,9 @@ use chrono::NaiveDate;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(
+    Queryable, Selectable, Identifiable, Associations, Debug, PartialEq, Deserialize, Serialize,
+)]
 #[diesel(belongs_to(crate::models::container::Container))]
 #[diesel(belongs_to(crate::models::category::Category))]
 #[diesel(table_name = crate::database::schema::items)]

@@ -64,10 +64,5 @@ diesel::joinable!(items -> containers (container_id));
 diesel::joinable!(kinds -> groups (group_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    categories,
-    containers,
-    groups,
-    items,
-    kinds,
-    locations,
+    categories, containers, groups, items, kinds, locations,
 );

@@ -1,4 +1,4 @@
-use actix_web::{get, HttpResponse, web};
+use actix_web::{get, web, HttpResponse};
 use serde::Serialize;
 
 use crate::constants::APPLICATION_JSON;
@@ -10,9 +10,7 @@ use crate::web::pageable::Pageable;
 use super::types::WDPool;
 
 fn http_ok_json<T: Serialize>(json: T) -> HttpResponse {
-    HttpResponse::Ok()
-        .content_type(APPLICATION_JSON)
-        .json(json)
+    HttpResponse::Ok().content_type(APPLICATION_JSON).json(json)
 }
 
 #[get("/location")]
@@ -24,7 +22,11 @@ pub async fn location_list(page: web::Query<Pageable>, pool: WDPool) -> HttpResp
 }
 
 #[get("/location/search")]
-pub async fn location_search(words: web::Query<FilterConfig>, page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+pub async fn location_search(
+    words: web::Query<FilterConfig>,
+    page: web::Query<Pageable>,
+    pool: WDPool,
+) -> HttpResponse {
     match locations::search(words.into_inner().to_filter(), page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
@@ -48,7 +50,11 @@ pub async fn group_list(page: web::Query<Pageable>, pool: WDPool) -> HttpRespons
 }
 
 #[get("/group/search")]
-pub async fn group_search(words: web::Query<FilterConfig>, page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+pub async fn group_search(
+    words: web::Query<FilterConfig>,
+    page: web::Query<Pageable>,
+    pool: WDPool,
+) -> HttpResponse {
     match groups::search(words.into_inner().to_filter(), page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
@@ -72,7 +78,11 @@ pub async fn container_list(page: web::Query<Pageable>, pool: WDPool) -> HttpRes
 }
 
 #[get("/container/search")]
-pub async fn container_search(words: web::Query<FilterConfig>, page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+pub async fn container_search(
+    words: web::Query<FilterConfig>,
+    page: web::Query<Pageable>,
+    pool: WDPool,
+) -> HttpResponse {
     match containers::search(words.into_inner().to_filter(), page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
@@ -96,7 +106,11 @@ pub async fn kind_list(page: web::Query<Pageable>, pool: WDPool) -> HttpResponse
 }
 
 #[get("/kind/search")]
-pub async fn kind_search(words: web::Query<FilterConfig>, page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+pub async fn kind_search(
+    words: web::Query<FilterConfig>,
+    page: web::Query<Pageable>,
+    pool: WDPool,
+) -> HttpResponse {
     match kinds::search(words.into_inner().to_filter(), page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
@@ -120,7 +134,11 @@ pub async fn category_list(page: web::Query<Pageable>, pool: WDPool) -> HttpResp
 }
 
 #[get("/category/search")]
-pub async fn category_search(words: web::Query<FilterConfig>, page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+pub async fn category_search(
+    words: web::Query<FilterConfig>,
+    page: web::Query<Pageable>,
+    pool: WDPool,
+) -> HttpResponse {
     match categories::search(words.into_inner().to_filter(), page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),
@@ -144,7 +162,11 @@ pub async fn item_all(page: web::Query<Pageable>, pool: WDPool) -> HttpResponse 
 }
 
 #[get("/item/search")]
-pub async fn item_search(words: web::Query<FilterConfig>, page: web::Query<Pageable>, pool: WDPool) -> HttpResponse {
+pub async fn item_search(
+    words: web::Query<FilterConfig>,
+    page: web::Query<Pageable>,
+    pool: WDPool,
+) -> HttpResponse {
     match items::search(words.into_inner().to_filter(), page.into_inner(), &pool) {
         Ok(v) => http_ok_json(v),
         Err(e) => diesel_error(e),

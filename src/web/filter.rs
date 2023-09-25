@@ -4,26 +4,24 @@ use serde::Deserialize;
 #[macro_export]
 macro_rules! gen_filter_fn {
     ($func_name:tt, $filter_field_ty:ty, $filter_field_expr:expr) => {
-fn $func_name<T: 'static>(filter: Filter) -> Box<dyn BoxableExpression<T, Mysql, SqlType=Bool>>
-where
-    diesel::dsl::Like<$filter_field_ty, &'static str>: BoxableExpression<T, Mysql, SqlType=Bool>, $filter_field_ty: SelectableExpression<T>
-{
-    let mut words = filter.words.clone();
-    let first = Box::new($filter_field_expr.like(format!("%{}%", words.pop().unwrap())));
-    let result: Box<dyn BoxableExpression<T, Mysql, SqlType=Bool>> =
-        words
-            .into_iter()
-            .map(|word|
-                $filter_field_expr.like(format!("%{}%", word))
-            )
-            .fold(
-                first,
-                |predicate, next_predicate| {
+        fn $func_name<T: 'static>(
+            filter: Filter,
+        ) -> Box<dyn BoxableExpression<T, Mysql, SqlType = Bool>>
+        where
+            diesel::dsl::Like<$filter_field_ty, &'static str>:
+                BoxableExpression<T, Mysql, SqlType = Bool>,
+            $filter_field_ty: SelectableExpression<T>,
+        {
+            let mut words = filter.words.clone();
+            let first = Box::new($filter_field_expr.like(format!("%{}%", words.pop().unwrap())));
+            let result: Box<dyn BoxableExpression<T, Mysql, SqlType = Bool>> = words
+                .into_iter()
+                .map(|word| $filter_field_expr.like(format!("%{}%", word)))
+                .fold(first, |predicate, next_predicate| {
                     Box::new(predicate.and(next_predicate))
-                },
-            );
-    result
-}
+                });
+            result
+        }
     };
 }
 

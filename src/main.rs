@@ -3,35 +3,34 @@ extern crate diesel;
 
 use std::{env, io};
 
-use actix_web::{App, HttpServer, middleware};
+use actix_web::{middleware, App, HttpServer};
 
 use crate::database::mysql::get_pool;
 
 mod models {
-    pub mod group;
+    pub mod category;
     pub mod container;
+    pub mod group;
+    pub mod item;
     pub mod kind;
     pub mod location;
-    pub mod category;
-    pub mod item;
 }
 
 mod web {
-    pub mod router;
-    pub mod types;
     pub mod error;
     pub mod filter;
     pub mod pageable;
+    pub mod router;
+    pub mod types;
 }
 
-
 mod repositories {
-    pub mod locations;
-    pub mod groups;
-    pub mod kinds;
     pub mod categories;
     pub mod containers;
+    pub mod groups;
     pub mod items;
+    pub mod kinds;
+    pub mod locations;
 }
 
 mod dto {}
@@ -73,7 +72,7 @@ async fn main() -> io::Result<()> {
             .service(web::router::item_search)
             .service(web::router::item)
     })
-        .bind("0.0.0.0:9090")?
-        .run()
-        .await
+    .bind("0.0.0.0:9090")?
+    .run()
+    .await
 }
