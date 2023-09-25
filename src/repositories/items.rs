@@ -17,7 +17,7 @@ use crate::models::{category, container, group, kind, location};
 use crate::web::filter::Filter;
 use crate::web::pageable::Pageable;
 use crate::web::types::WDPool;
-use crate::{apply_pageable, gen_filter_fn};
+use crate::{apply_pageable, gen_filters_fn};
 
 macro_rules! get_select {
     () => {
@@ -35,9 +35,10 @@ macro_rules! get_select {
     };
 }
 
-gen_filter_fn!(get_filters_name, items::name, items::name);
-gen_filter_fn!(
-    get_filters_description,
+gen_filters_fn!(
+    get_filters,
+    items::name,
+    items::name,
     items::description,
     items::description
 );
@@ -90,9 +91,7 @@ pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<
     let mut select = get_select!().into_boxed();
 
     if !filter.words.is_empty() {
-        let name = get_filters_name(filter.clone());
-        let description = get_filters_description(filter);
-        select = select.filter(name.or(description));
+        select = select.filter(get_filters(filter));
     }
 
     let result = apply_pageable!(select, page).get_results(conn);

@@ -7,15 +7,16 @@ use diesel::{
 
 use crate::apply_pageable;
 use crate::database::schema::locations;
-use crate::gen_filter_fn;
+use crate::gen_filters_fn;
 use crate::models::location::Location;
 use crate::web::filter::Filter;
 use crate::web::pageable::Pageable;
 use crate::web::types::WDPool;
 
-gen_filter_fn!(get_filters_name, locations::name, locations::name);
-gen_filter_fn!(
-    get_filters_description,
+gen_filters_fn!(
+    get_filters,
+    locations::name,
+    locations::name,
     locations::description,
     locations::description
 );
@@ -35,9 +36,7 @@ pub fn search(filter: Filter, page: Pageable, pool: &WDPool) -> QueryResult<Vec<
     let mut select = locations::table.select(Location::as_select()).into_boxed();
 
     if !filter.words.is_empty() {
-        let name = get_filters_name(filter.clone());
-        let description = get_filters_description(filter);
-        select = select.filter(name.or(description));
+        select = select.filter(get_filters(filter));
     }
 
     select = apply_pageable!(select, page);
